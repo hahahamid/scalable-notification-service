@@ -1,21 +1,33 @@
-const nodemailer = require('nodemailer');
-const { SENDGRID_API_KEY } = require('../../config/config');
+const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  service: 'SendGrid',
+  host: process.env.SMTP_HOST,
+  port: process.env.SMTP_PORT,
+  secure: false, 
+  requireTLS: true,
   auth: {
-    api_key: SENDGRID_API_KEY,
+    user: process.env.SMTP_USERNAME,
+    pass: process.env.SMTP_PASSWORD,
   },
 });
 
 async function sendEmail(to, subject, text) {
   const mailOptions = {
-    from: 'your_email@example.com',
+    from: "verified_email@example.com", 
     to,
     subject,
     text,
   };
-  await transporter.sendMail(mailOptions);
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email sent successfully:", info.messageId);
+  } catch (error) {
+    console.log(error);
+    
+    console.error("Error sending email:", error);
+    throw error; 
+  }
 }
 
 module.exports = { sendEmail };

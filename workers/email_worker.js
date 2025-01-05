@@ -1,8 +1,11 @@
-const redis = require('redis');
+const redisClient = require('../redisClient');
 const { sendEmail } = require('../api_gateway/controllers/emailController');
 
-const client = redis.createClient();
-const subscriber = redis.createClient();
+const subscriber = redisClient.duplicate();
+
+subscriber.on('connect', () => {
+  console.log('Subscriber connected to Redis');
+});
 
 subscriber.subscribe('email_queue');
 
